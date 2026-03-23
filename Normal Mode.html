@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>🌱โหมดฝึกหัด : ยอดนักโปรแกรมเมอร์จิ๋ว The Coder’s Way</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        //body { font-family: 'Sarabun', sans-serif; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; min-height: 100vh; overflow-x: hidden; }
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            /* ใส่พื้นหลังรูปสวนการ์ตูน */
+            background-image: linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url('background.jpg');
+            //background-image: url('https://img.freepik.com/free-vector/nature-forest-landscape-background_1308-72647.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 20px; 
+            margin: 0; 
+            min-height: 100vh; 
+        }
+        /* --- ✨ Keyframes & Animations --- */
+        @keyframes pulseEffect { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        @keyframes heartPop { 0% { transform: translateY(0) scale(0.8); opacity: 0; } 25% { transform: translateY(-30px) scale(1.4); opacity: 1; } 100% { transform: translateY(-70px) scale(1); opacity: 0; } }
+        
+        /* --- 📝 สไตล์กล่องคำแนะนำ (Mission Guide) --- */
+        #guide-screen { display: none; background: white; padding: 30px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 450px; border: 5px solid #ff9800; text-align: left; margin-top: 50px; }
+        .guide-item { background: #fff8e1; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid #ffb300; }
+        .guide-item strong { color: #e65100; display: block; margin-bottom: 5px; font-size: 18px; }
+        .guide-item p { margin: 0; font-size: 15px; color: #5d4037; line-height: 1.5; }
+
+        /* ส่วนอื่นๆ ของ UI */
+        #login-screen { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); text-align: center; width: 400px; border: 5px solid #2e7d32; margin-top: 50px; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #1b5e20; }
+        .input-group input { width: 100%; padding: 12px 15px; border: 2px solid #ddd; border-radius: 12px; box-sizing: border-box; }
+        .btn-start { background: linear-gradient(135deg, #4caf50, #2e7d32); color: white; padding: 15px 35px; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; width: 100%; font-weight: bold; }
+        .btn-go { background: linear-gradient(135deg, #ff9800, #f57c00); color: white; padding: 15px 35px; border: none; border-radius: 15px; font-size: 18px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+        
+        #game-screen { display: none; width: 100%; flex-direction: column; align-items: center; }
+        .header { background: linear-gradient(135deg, #1b5e20, #003300); color: white; padding: 15px; border-radius: 20px; width: 95%; text-align: center; margin-bottom: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .level-nav { background: white; padding: 10px 20px; border-radius: 50px; margin-bottom: 15px; border: 2px solid #2e7d32; display: flex; align-items: center; gap: 15px; font-weight: bold; color: #1b5e20; }
+        .level-nav select { padding: 5px 10px; border-radius: 10px; border: 1px solid #2e7d32; font-family: 'Sarabun'; cursor: pointer; }
+        .total-score-box { background: linear-gradient(135deg, #ffd54f, #ffb300); padding: 10px 25px; border-radius: 18px; font-size: 20px; font-weight: bold; color: #5d4037; border: 3px solid #ffa000; margin-bottom: 15px; }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 1100px; }
+        .game-card { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 5px solid #a5d6a7; position: relative; }
+        .grid { display: grid; grid-template-columns: repeat(6, 60px); grid-gap: 8px; background: #f1f8e9; padding: 15px; border-radius: 15px; }
+        .cell { width: 60px; height: 60px; background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; border: 1px solid #dcedc8; position: relative; }
+        
+        .goal-icon { animation: pulseEffect 1.5s infinite ease-in-out; display: inline-block; }
+        .goal { background-color: #e1f5fe !important; border: 3px dashed #0288d1; border-radius: 50%; }
+        .waypoint { background-color: #fff9c4 !important; border: 2px solid #fbc02d; border-radius: 50%; }
+        .wp-icon { animation: pulseEffect 1.2s infinite ease-in-out; display: inline-block; }
+        .waypoint.collected { opacity: 0.2; background-color: #eee !important; border-color: #ccc; }
+        .obstacle-durian { background-color: #fff9c4 !important; border: 2px solid #fbc02d; border-radius: 10px; }
+        #player { font-size: 50px; position: absolute; z-index: 10; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .heart-pop { position: absolute; font-size: 45px; color: #f44336; pointer-events: none; z-index: 100; animation: heartPop 1.2s ease-in-out forwards; }
+
+        .planner-card { width: 340px; background: #ffffff; border-radius: 25px; padding: 20px; border: 4px solid #2e7d32; }
+        .command-list { background: #fafafa; border: 2px inset #eee; margin: 15px 0; padding: 12px; min-height: 100px; max-height: 100px; overflow-y: auto; display: flex; flex-wrap: wrap; gap: 6px; border-radius: 12px; }
+        .cmd-badge { background: #43a047; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
+        .btn-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        button { padding: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 4px #1b5e20; font-family: 'Sarabun'; }
+        .btn-cmd { background: #66bb6a; color: white; }
+        .btn-run { background: linear-gradient(135deg, #ff9800, #f57c00); color: white; width: 100%; font-size: 18px; margin-top: 15px; box-shadow: 0 4px #e65100; }
+        .btn-delete { background: #f44336; color: white; width: 100%; margin-top: 10px; box-shadow: 0 4px #b71c1c; }
+        .stats { margin-bottom: 10px; font-size: 18px; font-weight: bold; color: #1b5e20; display: flex; justify-content: space-between; }
+        #msg { color: #d32f2f; font-weight: bold; text-align: center; min-height: 24px; margin-top: 10px; font-size: 14px; }
+.obstacle-icon {
+    width: 50px;
+    height: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.3s;
+}
+.obstacle-icon:hover {
+    transform: scale(1.1); /* ขยายเล็กน้อยเวลาเอาเมาส์วาง */
+}
+/* --- 🏆 สไตล์หน้าจอฉากจบ (Victory Screen) --- */
+#victory-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85); /* พื้นหลังดำโปร่งแสง */
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    text-align: center;
+    backdrop-filter: blur(8px); /* ทำพื้นหลังเบลอ */
+}
+
+.victory-card {
+    background: white;
+    padding: 40px;
+    border-radius: 30px;
+    color: #1b5e20;
+    border: 10px solid #ffd54f;
+    box-shadow: 0 0 50px rgba(255, 213, 79, 0.5);
+    max-width: 400px;
+    animation: pulseEffect 2s infinite ease-in-out;
+}
+
+.victory-card h2 { font-size: 40px; margin-bottom: 10px; }
+.victory-card p { font-size: 20px; margin: 10px 0; }
+.total-final-score { font-size: 48px; font-weight: bold; color: #e65100; margin: 20px 0; }
+
+.btn-restart {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    color: white;
+    padding: 15px 40px;
+    border: none;
+    border-radius: 50px;
+    font-size: 22px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 20px;
+    transition: 0.3s;
+}
+.btn-restart:hover { transform: scale(1.1); 
+}/* --- 🏆 จบสไตล์หน้าจอฉากจบ (Victory Screen) --- */
+		
+		@keyframes obstacleAppear {
+    0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+    70% { transform: scale(1.4) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.obstacle-animated {
+    display: inline-block;
+    animation: obstacleAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+    font-size: 30px; /* ปรับขนาดอิโมจิที่นี่ */
+}
+		
+.stamp {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 100px;
+    height: 100px;
+    border: 4px double #d32f2f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #d32f2f;
+    font-weight: bold;
+    transform: rotate(-15deg);
+    opacity: 0.8;
+    font-size: 14px;
+    text-align: center;
+}		
+		
+
+/* เพิ่มเอฟเฟกต์ให้ Robot ดูดุ๊กดิ๊ก */
+/* สร้างท่าทาง "ดุ๊กดิ๊ก" (เอียงไปมา + กระโดดเบาๆ) */
+@keyframes robotWiggle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+#player {
+        filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+       animation: robotWiggle 2s infinite ease-in-out;
+}
+/* จบเพิ่มเอฟเฟกต์ให้ Robot ดูดุ๊กดิ๊ก */
+
+
+
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <h2 style="color:#1b5e20;">ลงทะเบียนยอดนักโปรแกรมเมอร์จิ๋ว</h2>
+
+	<h2 style="color:#1b5e20;">[🌱โหมดฝึกหัด]</h2>
+    <div class="input-group"><label>ชื่อ-นามสกุล:</label><input type="text" id="username" placeholder="ชื่อของคุณ..."></div>
+    <div class="input-group"><label>ชั้นเรียน:</label><input type="text" id="userclass" placeholder="ป.3/1"></div>
+    <div class="input-group"><label>เลขที่:</label><input type="number" id="userno"></div>
+    <button class="btn-start" onclick="showGuide()">ลงทะเบียน ❤️</button>
+</div>
+
+<div id="guide-screen">
+    <h2 style="color:#e65100; text-align:center; margin-top:0;">📝 คู่มือยอดนักโปรแกรมเมอร์จิ๋ว</h2>
+    
+    <div class="guide-item">
+        <strong>📍 ช่วงแรก (ด่าน 1-5):</strong>
+        <p>เด็กๆ จะได้ฝึกเลือกทิศทางเบื้องต้น มีอุปสรรคไม่มาก<strong>กดแล้วเดินทันที</strong></p>
+    </div>
+    <div class="guide-item">
+        <strong>❤️ ช่วงสอง (ด่าน 6-10):</strong>
+        <p>เด็กๆ ต้องใช้ทักษะในการคิดเพิ่มขึ้น เริ่มมีมีอุปสรรคมากขึ้น <strong>กดแล้วเดินทันที</strong></p>
+    </div>
+    <div class="guide-item">
+        <strong>🧠 ช่วงสาม (ด่าน 11-17):</strong>
+        <p>เด็กๆ ต้องใช้ทักษะ การคิดเชิงอัลกอริทึม:Algorithmic Thinking<strong>ในการวางแผนคำสั่งยาวๆ ก่อนรันผลการเดิน</strong> </p>
+    </div>
+
+    <div class="guide-item">
+        <strong>⭐ ช่วงท้าย (ด่าน 18-20):</strong>
+        <p>เพิ่มความซับซ้อนด้วย ภารกิจหลายเป้าหมาย:Multiple Objectives (เก็บดาว 2-4 จุด) และต้องวางแผนการเดินก่อน<strong>ซึ่งจะช่วยพัฒนาทักษะการแก้ปัญหาอย่างมีระบบ</strong> </p>
+    </div>
+    <div class="guide-item">
+        <strong>🏆 มีคะแนนด่านละ 100 คะแนน:</strong>
+        <p>เพิ่มความรอบครอบและการสังเกต <strong>หากเดินชนอุปสรรคหรือกำแพงจะหักคะแนน<br>ครั้งละ 5 คะแนนเลยนะ</p>
+    </div>
+
+    <button class="btn-go" onclick="startGame()">เข้าใจแล้ว เริ่มเลย! 🌱</button>
+</div>
+
+<div id="game-screen">
+    <div class="header"><h1>🤖 ยอดนักโปรแกรม Coding ตัวจิ๋ว [🌱โหมดฝึกหัด]</h1></div>
+    <div class="level-nav">
+        📍 ด่าน: <select id="levelSelect" onchange="jumpToLevel()"></select>
+        <span id="mode-badge" style="font-size: 12px; background: #e8f5e9; padding: 4px 10px; border-radius: 10px;"></span>
+    </div>
+	<div class="total-score-box">👤 ผู้เล่น: <span id="player-name-disp"  style="color: #1b5e20; margin-right: 20px;">-</span> 
+	 📚 ชั้น: <span id="player-class-disp" style="color: #1b5e20; margin-right: 15px;">-</span> 
+     🔢 เลขที่: <span id="player-no-disp" style="color: #1b5e20; margin-right: 20px;">-</span>
+ 	 🏆 คะแนนสะสม: <span id="total-score-disp">0</span> คะแนน
+	</div>
+    <div class="container">
+        <div class="game-card" id="main-card">
+            <div class="stats"><span>⭐ แต้ม: <span id="score">100</span></span><span>🏁 ด่าน: <span id="curLvlDisp">1</span></span></div>
+            <div class="grid" id="board"></div>
+            <p id="msg"></p>
+        </div>
+        <div class="planner-card">
+            <h3 id="panel-title" style="text-align:center; color:#1b5e20; margin-top:0;">วางแผนการเดิน</h3>
+            <div id="command-queue" class="command-list"></div>
+            <div class="btn-group">
+                <button class="btn-cmd" onclick="handleInput('⬆️')">⬆️ ขึ้น</button>
+                <button class="btn-cmd" onclick="handleInput('⬇️')">⬇️ ลง</button>
+                <button class="btn-cmd" onclick="handleInput('⬅️')">⬅️ ซ้าย</button>
+                <button class="btn-cmd" onclick="handleInput('➡️')">➡️ ขวา</button>
+            </div>
+            <button id="run-btn" class="btn-run" onclick="runCommands()">🚀 เดินตามแผน</button>
+            <button class="btn-delete" onclick="deleteLastCommand()">❌ ลบ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+// ฟังก์ชันสำหรับเลือกรูป (แบบสุ่ม หรือ ตามด่าน)
+function getObstacleImage(levelIndex) {
+    // วิธีที่ 1: สุ่มทุกครั้งที่โหลด
+    // return fruitImages[Math.floor(Math.random() * fruitImages.length)];
+    
+    // วิธีที่ 2: เปลี่ยนตามด่าน (เช่น ด่าน 1-5 เป็นทุเรียน, 6-10 เป็นมังคุด)
+    const imgIndex = Math.floor(levelIndex / 5) % fruitImages.length;
+    return fruitImages[imgIndex];
+}
+
+    // ข้อมูลด่าน (ใช้แบบที่ออกแบบใหม่ให้อัตโนมัติ)
+    const levels = [
+       // ด่าน 1-5: ฝึกเดินพื้นฐาน
+    { title: "ก้าวแรกนักเดิน", diff: "ง่าย", goal: {x:5, y:0}, durians: [{x:2,y:0},{x:3,y:2},{x:4,y:3}], mangos: [] },
+   /* { title: "วงล้อมสิ่งกีดขวาง", diff: "ง่าย", goal: {x:5, y:5}, durians: [{x:1,y:1},{x:2,y:2},{x:3,y:3},{x:1,y:2},{x:4,y:2}], mangos: [] },
+    { title: "กำแพงบังคับเลี้ยว", diff: "ง่าย", goal: {x:0, y:5}, durians: [{x:0,y:1},{x:1,y:1},{x:1,y:2},{x:1,y:3}], mangos: [] },
+    { title: "สี่มุมอันตราย", diff: "ง่าย",  goal: {x:3, y:3}, durians: [{x:2,y:2},{x:4,y:2},{x:2,y:4},{x:4,y:4}], mangos: [] },
+    { title: "ด่านตรวจแนวตั้ง", diff: "ง่าย", goal: {x:5, y:2}, durians: [{x:4,y:0},{x:4,y:1},{x:4,y:3},{x:4,y:4}], mangos: [] },
+
+    // ด่าน 6-10: เริ่มใช้ความคิด
+    { title: "ทางเดินซิกแซก", diff: "ปานกลาง", goal: {x:2, y:2}, durians: [{x:1,y:1},{x:2,y:1},{x:3,y:0},{x:1,y:2},{x:5,y:2},{x:1,y:3},{x:2,y:4},{x:3,y:3}], mangos: [] },
+    { title: "บันไดทแยงมุม", diff: "ปานกลาง", goal: {x:5, y:0}, durians: [{x:0,y:1},{x:1,y:2},{x:2,y:3},{x:3,y:4},{x:4,y:1},{x:1,y:3},{x:4,y:0}], mangos: [] },
+    { title: "จุดนัดพบมุมตรงข้าม", diff: "ปานกลาง",  goal: {x:0, y:0}, start: {x:5,y:5}, durians: [{x:2,y:2},{x:2,y:3},{x:3,y:2},{x:4,y:3},{x:2,y:0},{x:0,y:5}], mangos: [] },
+    { title: "กับดักรูปตัว L", diff: "ปานกลาง", goal: {x:5, y:5}, durians: [{x:4,y:1},{x:2,y:4},{x:3,y:4},{x:4,y:3},{x:2,y:3},{x:1,y:2},{x:0,y:4}], mangos: [] },
+    { title: "ประตูที่ถูกปิด", diff: "ปานกลาง", goal: {x:3, y:0}, durians: [{x:2,y:0},{x:4,y:0},{x:3,y:5},{x:2,y:5},{x:2,y:1},{x:3,y:4},{x:0,y:5}], mangos: [] },
+
+    // ด่าน 11-15: เพิ่มความซับซ้อน
+    { title: "ทแยงขึ้นเขา", diff: "ยาก", goal: {x:4, y:1}, start: {x:0,y:5}, durians: [{x:1,y:4},{x:2,y:3},{x:3,y:2},{x:0,y:4},{x:4,y:5}], mangos: [] },
+    { title: "อุโมงค์สิ่งกีดขวาง", diff: "ยาก", goal: {x:4, y:3}, durians: [{x:1,y:0},{x:1,y:1},{x:1,y:3},{x:1,y:4},{x:2,y:5},{x:3,y:4},{x:1,y:1},{x:2,y:1}], mangos: [] }, // แก้ไขด่าน 12 ไม่ให้อุปสรรคทับเป้าหมาย
+    { title: "เขาวงกตแนวปะทะ", diff: "ยาก", goal: {x:5, y:3}, durians: [{x:4,y:2},{x:4,y:3},{x:4,y:4},{x:3,y:3},{x:0,y:4},{x:2,y:5},{x:1,y:2},{x:1,y:3},{x:0,y:5}], mangos: [] },
+    { title: "สะพานที่ขาดหาย", diff: "ยาก",  goal: {x:2, y:5}, durians: [{x:0,y:4},{x:1,y:4},{x:2,y:4},{x:2,y:1},{x:3,y:2},{x:4,y:5},{x:2,y:2},{x:0,y:1},{x:2,y:2},{x:5,y:0}], mangos: [] },
+    { title: "ป้อมปราการกลางเมือง", diff: "ยาก", goal: {x:3, y:3}, start: {x:5,y:0}, durians: [{x:2,y:2},{x:3,y:2},{x:4,y:2},{x:2,y:3},{x:2,y:5},{x:3,y:4},{x:0,y:4},{x:3,y:5},{x:1,y:2},{x:0,y:1}], mangos: [] },
+
+    // ด่าน 16-20: ภารกิจเก็บดาว
+    { title: "ขุมทรัพย์ที่มุมมืด", diff: "ท้าทาย", goal: {x:5, y:5}, waypoints: [{x:5,y:0}], durians: [{x:4,y:0},{x:4,y:1},{x:4,y:2},{x:3,y:4},{x:1,y:1},{x:2,y:1},{x:0,y:4},{x:3,y:5},{x:1,y:2}], mangos: [] },
+    { title: "ภารกิจไป-กลับ", diff: "ท้าทาย", goal: {x:3, y:0}, waypoints: [{x:5,y:5}], durians: [{x:1,y:1},{x:2,y:2},{x:3,y:3},{x:0,y:4},{x:3,y:5},{x:1,y:2},{x:0,y:1},{x:3,y:2},{x:1,y:5}], mangos: [] },
+    { title: "สองประสานนำทาง", diff: "ท้าทาย", goal: {x:3, y:3}, waypoints: [{x:2,y:4},{x:5,y:5}], durians: [{x:1,y:0},{x:0,y:3},{x:4,y:5},{x:0,y:5},{x:3,y:2},{x:1,y:5}], mangos: [] },
+    { title: "สามเหลี่ยมมหาภัย", diff: "ท้าทาย", goal: {x:5, y:0}, waypoints: [{x:0,y:5},{x:5,y:5},{x:0,y:1},], durians: [{x:2,y:2},{x:3,y:3},{x:1,y:1},{x:0,y:3},{x:3,y:2},{x:1,y:5}], mangos: [] },
+    { title: "แชมป์เปี้ยน Coding", diff: "ตำนาน", goal: {x:2, y:2}, waypoints: [{x:3,y:3},{x:5,y:0},{x:0,y:5},{x:5,y:5}], durians: [{x:2,y:1},{x:1,y:3},{x:4,y:2},{x:0,y:2},{x:3,y:5}], mangos: [] }*/
+];
+
+    let curLvl = 0, maxUnlockedLvl = 0, completedLvls = new Set();
+    let playerPos = { x: 0, y: 0 }, collectedWPs = 0;
+    let queue = [], isRunning = false, score = 100, totalScore = 0;
+
+    function showGuide() {
+        if(!document.getElementById('username').value) { alert("กรอกชื่อก่อนครับ"); return; }
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('guide-screen').style.display = 'block';
+    }
+
+    function startGame() {
+    // 1. ดึงชื่อจากช่อง Input มาเก็บไว้ในตัวแปร
+    const name = document.getElementById('username').value;
+	const uClass = document.getElementById('userclass').value;
+    const uNo = document.getElementById('userno').value;
+    
+    // 2. นำชื่อไปแสดงในหน้าจอเกม (ID: player-name-disp)
+    document.getElementById('player-name-disp').innerText = name;
+    document.getElementById('player-class-disp').innerText = uClass || "-";
+    document.getElementById('player-no-disp').innerText = uNo || "-";
+
+    // ส่วนของเดิมที่มีอยู่แล้ว
+    document.getElementById('guide-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'flex';
+    updateLevelSelect(); 
+    initLevel();
+}
+
+    function spawnHeart() {
+        const heart = document.createElement('div'); heart.className = 'heart-pop'; heart.innerHTML = '❤️';
+        const target = document.getElementById('player');
+        if(target) {
+            const rect = target.getBoundingClientRect();
+            const cardRect = document.getElementById('main-card').getBoundingClientRect();
+            heart.style.left = (rect.left - cardRect.left + 5) + 'px';
+            heart.style.top = (rect.top - cardRect.top - 10) + 'px';
+            document.getElementById('main-card').appendChild(heart);
+            setTimeout(() => heart.remove(), 1200);
+        }
+    }
+
+    function updateLevelSelect() {
+    const select = document.getElementById('levelSelect'); 
+    select.innerHTML = '';
+    
+    levels.forEach((lvl, i) => {
+        const opt = document.createElement('option'); 
+        opt.value = i;
+        
+        let isDone = completedLvls.has(i);
+        let status = isDone ? " ✅" : "";
+        
+        // ดึงชื่อด่านและระดับความยากมาแสดง (ถ้าไม่มีให้แสดงค่าว่าง)
+        let title = lvl.title || "ภารกิจใหม่";
+        let diff = lvl.diff || "ทั่วไป";
+        
+        // รูปแบบ: ด่าน 1: ก้าวแรกนักเดิน (ง่าย) ✅
+        opt.textContent = `ด่าน ${i + 1}: ${title} (${diff})${status}`;
+        
+        // ล็อกเฉพาะด่านที่ทำเสร็จแล้ว
+        opt.disabled = isDone; 
+        
+        select.appendChild(opt);
+    });
+    select.value = curLvl;
+}
+
+    function jumpToLevel() { curLvl = parseInt(document.getElementById('levelSelect').value); initLevel(); }
+
+    function initLevel() {
+        const level = levels[curLvl];
+        playerPos = level.start ? {...level.start} : { x: 0, y: 0 };
+        queue = []; score = 100; collectedWPs = 0;
+        document.getElementById('command-queue').innerHTML = '';
+        document.getElementById('score').innerText = '100';
+        document.getElementById('curLvlDisp').innerText = curLvl + 1;
+        document.getElementById('run-btn').style.display = curLvl < 10 ? 'none' : 'block';// เปลี่ยนเป็น < 10 เพื่อให้ด่าน 1-10 เดินทันที
+        document.getElementById('mode-badge').innerText = curLvl < 10 ? 'โหมด: เดินทันที' : 'โหมด: วางแผนการเดิน';// เปลี่ยนเป็น < 10 เพื่อให้ด่าน 1-10 เดินทันที
+	// แสดงชื่อด่านและระดับความยากในช่องข้อความแนะนำ (Message)
+        let titleInfo = `📍 ด่าน ${curLvl + 1}: ${level.title} [ระดับ: ${level.diff}]`;
+        document.getElementById('msg').innerText = titleInfo + (level.waypoints ? ` |📍 เก็บดาวให้ครบ ${level.waypoints.length} ดวง` : ' | พา Robot ไปที่สถานที่ที่กำหนด');
+        //document.getElementById('msg').innerText = level.waypoints ? `📍 เก็บดาวให้ครบ ${level.waypoints.length} ดวง` : 'พา Robot ไปที่สถานที่ที่กำหนด';
+        createBoard(); updateLevelSelect();
+    }
+
+ // 🍈 รายการอีโมจิผลไม้เมืองจันท์ (ทุเรียน, มังคุด, เงาะ, สละ/ส้ม)
+const fruitEmojis = ['Durian', 'Mangosteen', 'Rambutan', 'Salak', 'Corn', 'coconut']; 
+// หมายเหตุ: เนื่องจาก Emoji มาตรฐานไม่มีรูปทุเรียน/มังคุดตรงๆ 
+// เราจะใช้ตัวที่ใกล้เคียงหรือใช้ตัวอักษรภาพแทนครับ
+const fruitIcons = ['🍈', '🍇', '🍓', '🍊', '🌽', '🥥']; // ทุเรียน(เมล่อน), มังคุด(องุ่น), เงาะ(สตอเบอร์รี่), สละ(ส้ม)
+
+function createBoard() {
+    const board = document.getElementById('board'); 
+    board.innerHTML = '';
+    const level = levels[curLvl];
+
+    for (let y = 0; y < 6; y++) {
+        for (let x = 0; x < 6; x++) {
+            const cell = document.createElement('div'); 
+            cell.className = 'cell';
+            
+            // ⛪ วาดเป้าหมาย
+            if (x === level.goal.x && y === level.goal.y) {
+                cell.classList.add('goal');
+                cell.innerHTML = '<span class="goal-icon">⛪</span>';
+            }
+
+            // ⭐ วาดดาวสะสม (Waypoints)
+            const wp = level.waypoints?.findIndex(w => w.x === x && w.y === y);
+            if (wp !== -1 && level.waypoints) {
+                cell.classList.add('waypoint');
+                cell.id = `wp-${x}-${y}`;
+                cell.innerHTML = '<span class="wp-icon">⭐</span>';
+            }
+            
+            // 🥭 วาดอุปสรรคแบบสุ่ม Emoji และใส่แอนิเมชันเด้งดึ๋ง
+            if (level.durians && level.durians.some(d => d.x === x && d.y === y)) {
+                const obs = document.createElement('span'); 
+                
+                // สุ่มเลือก Emoji จาก fruitIcons ที่คุณมี
+                const randomEmoji = fruitIcons[Math.floor(Math.random() * fruitIcons.length)];
+                obs.innerText = randomEmoji;
+
+                obs.className = 'obstacle-animated'; // ใส่คลาสแอนิเมชันที่ทำไว้ใน CSS
+                
+                // สุ่มเวลาโผล่ไม่พร้อมกัน (0 - 0.5 วินาที) ให้ดูเหมือนป๊อปคอร์นเด้ง
+                obs.style.animationDelay = `${Math.random() * 0.5}s`; 
+
+                cell.appendChild(obs);
+            }
+            
+            board.appendChild(cell);
+        }
+    }
+    updatePlayer();
+}
+
+    function updatePlayer() {
+        const old = document.getElementById('player'); if(old) old.remove();
+        const target = document.getElementById('board').children[(playerPos.y*6)+playerPos.x];
+        const p = document.createElement('span'); p.id = 'player'; p.innerHTML = '🤖';
+        target.appendChild(p);
+
+        const level = levels[curLvl];
+        if (level.waypoints) {
+            const currentWP = document.getElementById(`wp-${playerPos.x}-${playerPos.y}`);
+            if (currentWP && !currentWP.classList.contains('collected')) {
+                currentWP.classList.add('collected'); collectedWPs++; spawnHeart();
+                document.getElementById('msg').innerText = `✨ เก็บดาวได้ ${collectedWPs}/${level.waypoints.length}`;
+            }
+        }
+    }
+
+    async function handleInput(cmd) {
+        if (isRunning) return;
+        if (curLvl < 10) await movePlayer(cmd);// เปลี่ยนเป็น < 10 เพื่อให้ด่าน 1-10 เดินทันที
+        else { queue.push(cmd); renderQueue(); }
+    }
+
+    function deleteLastCommand() { if (!isRunning && queue.length > 0) { queue.pop(); renderQueue(); } }
+
+    function renderQueue() {
+        const container = document.getElementById('command-queue'); container.innerHTML = '';
+        queue.forEach((cmd, idx) => {
+            const b = document.createElement('div'); b.className = 'cmd-badge'; b.innerText = (idx+1) + "." + cmd;
+            container.appendChild(b);
+        });
+    }
+
+async function movePlayer(cmd) {
+    const level = levels[curLvl];
+    let next = {...playerPos};
+    if(cmd === '⬆️') next.y--; if(cmd === '⬇️') next.y++;
+    if(cmd === '⬅️') next.x--; if(cmd === '➡️') next.x++;
+
+    // ตรวจสอบขอบสนามและอุปสรรค
+    if(next.x<0 || next.x>=6 || next.y<0 || next.y>=6 || level.durians.some(d=>d.x===next.x && d.y===next.y)) {
+        document.getElementById('msg').innerText = "💥 ชนอุปสรรค!";
+        score = Math.max(0, score - 5); 
+        document.getElementById('score').innerText = score;
+        return false;
+    }
+
+    playerPos = next; 
+    updatePlayer();
+
+    // เงื่อนไขการชนะ
+    if(playerPos.x === level.goal.x && playerPos.y === level.goal.y) {
+        if (level.waypoints && collectedWPs < level.waypoints.length) { 
+            document.getElementById('msg').innerText = "⚠️ ต้องเก็บดาวให้ครบก่อน!"; 
+            return false; 
+        }
+        
+        spawnHeart(); 
+        totalScore += score;
+        document.getElementById('total-score-disp').innerText = totalScore;
+        completedLvls.add(curLvl);
+
+        setTimeout(() => {
+            if (completedLvls.size === levels.length) {
+                showVictoryScreen();
+            } else {
+                alert(`🎉 คุณ ${document.getElementById('username').value} เก่งมาก! ผ่านด่านที่ ${curLvl+1}`);
+                
+                // หาด่านถัดไปที่ยังไม่ได้ทำ (เรียงจาก 0-19)
+                let nextAvailable = -1;
+                for(let i = 0; i < levels.length; i++) {
+                    if(!completedLvls.has(i)) {
+                        nextAvailable = i;
+                        break;
+                    }
+                }
+
+                if (nextAvailable !== -1) {
+                    curLvl = nextAvailable;
+                    initLevel();
+                }
+            }
+        }, 500);
+        return false; // หยุดการเดินในคิวเมื่อถึงเส้นชัย
+    }
+    return true;
+}
+
+async function runCommands() {
+    if (queue.length === 0 || isRunning) return;
+    isRunning = true;
+    const currentQueue = [...queue]; 
+    queue = []; 
+    renderQueue();
+    
+    for (let cmd of currentQueue) { 
+        let canContinue = await movePlayer(cmd);
+        if (!canContinue) break; 
+        await new Promise(r => setTimeout(r, 450)); 
+    }
+    isRunning = false;
+}
+// functionแสดงหน้าจอจบเกม
+
+function showVictoryScreen() {
+	saveStats();
+// 1. ดึงชื่อจากช่อง Input ตอนเริ่มเกม (id="username")
+// 1. ดึงชื่อจากช่องที่เด็กพิมพ์ตอนเริ่มเกม
+    const playerName = document.getElementById('username').value || "ผู้เล่น";
+
+    // 2. สั่งให้ชื่อไปโผล่ในใบประกาศ (ใช้ ID "end-username" ให้ตรงกับ HTML ของครู)
+    const nameDisplay = document.getElementById('end-username');
+    if (nameDisplay) {
+        nameDisplay.innerText = playerName;
+    }
+    const finalScoreDisp = document.getElementById('final-score-disp');
+    finalScoreDisp.innerText = totalScore + " คะแนน";
+	finalScoreDisp.style.color = (totalScore < 0) ? "#d32f2f" : "#e65100";
+// ปรับสีและข้อความตามคะแนน
+    /*if (totalScore < 0) {
+        finalScoreDisp.style.color = "#d32f2f";
+        document.querySelector('.victory-card h2').innerText = "😅 พยายามเข้า! 😅";
+    } else {
+        finalScoreDisp.style.color = "#e65100";
+        document.querySelector('.victory-card h2').innerText = "🏆 ไชโย! 🏆";
+    }*/
+    
+    document.getElementById('victory-screen').style.display = 'flex';
+
+
+    // ระบบ Rank
+    let rankText = "";
+    let rankColor = "";
+
+    if (totalScore >= 1800) {
+        rankText = "🏅 อันดับ: ศาสตราจารย์ Coding (ระดับตำนาน)";
+        rankColor = "#ff8f00"; // สีทองเข้ม
+    } else if (totalScore >= 1200) {
+        rankText = "🥈 อันดับ: วิศวกรซอฟต์แวร์จิ๋ว (ระดับสูง)";
+        rankColor = "#2e7d32"; // สีเขียวเข้ม
+    } else if (totalScore >= 500) {
+        rankText = "🥉 อันดับ: นักเขียนโปรแกรมรุ่นเยาว์";
+        rankColor = "#1565c0"; // สีน้ำเงิน
+    } else if (totalScore >= 0) {
+        rankText = "🌱 อันดับ: นักเรียนฝึกหัด Coding";
+        rankColor = "#5d4037"; // สีน้ำตาล
+    } else {
+        // กรณีคะแนนติดลบ
+        rankText = "⚠️ อันดับ: ผู้กล้าผู้ไม่ยอมแพ้ (สู้ต่อไป!)";
+        rankColor = "#d32f2f"; // สีแดง
+    }
+
+    const rankElement = document.getElementById('rank-name');
+    rankElement.innerText = rankText;
+    rankElement.style.color = rankColor;
+    
+    // เปลี่ยนสีตัวเลขคะแนนถ้าติดลบ
+    finalScoreDisp.style.color = (totalScore < 0) ? "#d32f2f" : "#e65100";
+
+    document.getElementById('victory-screen').style.display = 'flex';
+}
+
+//จบfunctionแสดงหน้าจอจบเกม<br>
+
+
+// --- ส่วนที่เพิ่ม: ระบบจัดการสถิติ (แยกจากฟังก์ชันเดิม) ---
+function saveStats() {
+    const name = document.getElementById('username').value || "ผู้เล่น";
+    const uClass = document.getElementById('userclass').value || "-";
+    const uNo = document.getElementById('userno').value || "-";
+    
+    let allScores = JSON.parse(localStorage.getItem('aocla_Normal')) || [];
+    
+    // 1. ตรวจสอบความซ้ำ (ชื่อ+เลขที่+ชั้น)
+    const existingIndex = allScores.findIndex(item => 
+        item.name === name && item.no === uNo && (item.uClass === uClass || item.uClasss === uClass)
+    );
+
+    const now = new Date().getTime(); // เปลี่ยนเป็นตัวเลข (Timestamp) เพื่อให้ลบกันได้แม่นยำ
+
+    if (existingIndex !== -1) {
+        if (totalScore >= allScores[existingIndex].score) {
+            allScores[existingIndex].score = totalScore;
+            allScores[existingIndex].date = now; 
+        }
+    } else {
+        allScores.push({
+            name: name,
+            uClass: uClass, // แก้ไข uClasss เป็น uClass (ลบ s ออก)
+            no: uNo,
+            score: totalScore,
+            date: now
+        });
+    }
+
+    // 2. การเรียงลำดับ: คะแนนมาก่อน -> ถ้าเท่ากัน เอาเวลาใหม่ล่าสุด (ค่ามาก) ขึ้นก่อน
+   	allScores.sort((a, b) => {
+    if (Number(b.score) !== Number(a.score)) {
+        return Number(b.score) - Number(a.score);
+    }
+    // ใช้ Number() ครอบเพื่อให้มั่นใจว่าเป็นตัวเลขเวลา แล้วเอาค่ามาก (ใหม่กว่า) ขึ้นก่อน
+    return Number(b.date) - Number(a.date); 
+	});
+
+    localStorage.setItem('aocla_Normal', JSON.stringify(allScores));
+}
+
+
+function downloadLog() {
+    const name = document.getElementById('username').value || "ผู้เล่น";
+    const uNo = document.getElementById('userno').value || "0";
+    const uClass = document.getElementById('userclass').value || "-";
+	
+    const content = `--- รายงานผล โหมดวางแผน ---\nชื่อ: ${name}\nชั้น: ${uClass}\nเลขที่: ${uNo}\nคะแนน: ${totalScore}\nวันที่: ${new Date().toLocaleString('th-TH')}`;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.download = `โหมดฝึกหัด_${name}_ชั้น${uClass}_เลขที่${uNo}.txt`;
+    a.href = window.URL.createObjectURL(blob);
+    a.click();
+}
+
+function showScoreTable() {
+    const tbody = document.getElementById('score-tbody');
+    const allScores = JSON.parse(localStorage.getItem('aocla_Normal')) || [];
+	
+	// --- จุดสำคัญ: สั่งเรียงลำดับใหม่ทุกครั้งก่อนแสดงผล ---
+    allScores.sort((a, b) => {
+        // 1. เรียงคะแนนจากมากไปน้อย
+        if (Number(b.score) !== Number(a.score)) {
+            return Number(b.score) - Number(a.score);
+        }
+        // 2. ถ้าคะแนนเท่ากัน ให้เอาเวลาล่าสุด (ค่าเลข Timestamp ที่มากกว่า) ขึ้นก่อน
+        // ใช้ Number() เพื่อแปลงค่าวันที่ให้เป็นตัวเลขที่เปรียบเทียบกันได้ 100%
+        let dateA = a.date ? new Date(a.date).getTime() : 0;
+        let dateB = b.date ? new Date(b.date).getTime() : 0;
+        return dateB - dateA;
+    });
+	
+	// แสดงผลแค่ 10 อันดับแรก
+    const displayScores = allScores.slice(0, 10);
+
+    tbody.innerHTML = displayScores.map((item, index) => `
+        <tr style="${index < 3 ? 'background:#fff9c4;' : ''}">
+            <td style="padding:8px; border:1px solid #ddd;">${index + 1}</td>
+            <td style="padding:8px; border:1px solid #ddd; text-align:left;">
+                ${item.name} ชั้น${item.uClass || item.uClasss || "-"} เลขที่${item.no}
+            </td>
+            <td style="padding:8px; border:1px solid #ddd; color:#e65100; font-weight:bold;">${item.score}</td>
+        </tr>
+    `).join('');
+    document.getElementById('score-table-overlay').style.display = 'flex';
+}
+
+// แก้ไขจุดเดียวในฟังก์ชันเดิมของคุณครู:
+// ให้เติม saveStats(); ไว้บรรทัดแรกข้างใน showVictoryScreen เพื่อให้มันบันทึกข้อมูลตอนจบเกมครับ		
+		
+
+
+
+
+
+</script>
+
+<div id="victory-screen">
+    <div class="victory-card certificate-border">
+        <h1 style="margin:0; color:#1b5e20;">ใบประกาศเกียรติคุณ</h1>
+        <p>ขอมอบให้เพื่อแสดงว่า</p>
+		<h2 id="end-username" style="color:#2e7d32; text-decoration: underline;"></h2>
+        <p>ได้ผ่านการทดสอบทักษะ Coding <br>ทั้งหมด 20 ภารกิจ 🌱โหมดฝึกหัด</p>
+        
+        <div id="rank-name" class="rank-badge">กำลังคำนวณอันดับ...</div>
+        
+        <div style="font-size: 16px;">คะแนนรวมสะสม: <span id="final-score-disp" style="font-weight:bold;">0</span></div>
+        
+        <div class="stamp">ผ่านการ<br>ตรวจสอบโดย <br>ครูสุริยัน</div>
+        
+		<div style="margin-bottom: 15px; display: flex; gap: 8px; justify-content: center;">
+		<button onclick="downloadLog()" style="background:#0288d1; color:white; border:none; padding:10px 15px; border-radius:10px; cursor:pointer; font-family:'Sarabun';">💾 บันทึกไฟล์ TXT</button>
+		<button onclick="showScoreTable()" style="background:#ffa000; color:white; border:none; padding:10px 15px; border-radius:10px; cursor:pointer; font-family:'Sarabun';">📊 อันดับคะแนน</button>
+		</div>
+		<button class="btn-restart" onclick="window.location.href='main.html'">เล่นใหม่อีกครั้ง 🔄</button>
+		
+    </div>
+</div>
+
+<div id="score-table-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:10000; justify-content:center; align-items:center; font-family:'Sarabun';">
+    <div style="background:white; padding:25px; border-radius:20px; width:90%; max-width:420px; text-align:center; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+        <h2 style="color:#2e7d32; margin-top:0;">📊 10 อันดับยอดนักโปรแกรมเมอร์จิ๋ว<br>The Coder’s Way🌱โหมดฝึกหัด</h2>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:15px;">
+            <thead>
+                <tr style="background:#f1f8e9; border-bottom:2px solid #2e7d32;">
+                    <th style="padding:10px; border:1px solid #ddd;">ที่</th>
+                    <th style="padding:10px; border:1px solid #ddd;">ชื่อ-นามสกุล  ระดับชั้น  เลขที่</th>
+                    <th style="padding:10px; border:1px solid #ddd;">คะแนน</th>
+                </tr>
+            </thead>
+            <tbody id="score-tbody"></tbody>
+        </table>
+        <button onclick="document.getElementById('score-table-overlay').style.display='none'" style="width:100%; padding:12px; background:#c62828; color:white; border:none; border-radius:10px; cursor:pointer; font-weight:bold;">❌ ปิดหน้าต่าง</button>
+    </div>
+</div>	
+	
+	
+	
+	
+	
+	
+<div class="footer-credits">
+    <p>พัฒนาโดย: <strong>นายสุริยัน ไตรยพันธ์</strong></p>
+    <p>© 2025 Unplugged coding - All Rights Reserved</p>
+</div>
+
+</body>
+</html>

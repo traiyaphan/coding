@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการสถิติผู้เล่น (Admin) - ยอดนักโปรแกรมเมอร์จิ๋ว : The Coder’s Way</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .admin-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h2 { color: #1b5e20; }
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .stats-table th, .stats-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .stats-table th { background-color: #e8f5e9; }
+        
+        /* ส่วนกรอกรหัสผ่าน */
+        #auth-section { margin-bottom: 20px; }
+        #admin-content { display: none; } /* ซ่อนไว้จนกว่าจะใส่รหัสถูก */
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+        }
+        .btn-delete { background-color: #d32f2f; color: white; }
+        .btn-back { background-color: #757575; color: white; text-decoration: none; display: inline-block; }
+        .btn-login { background-color: #2e7d32; color: white; }
+        
+        input[type="password"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <h2>🔑 ระบบจัดการข้อมูลครู (Admin)</h2>
+        <p style="color: #666;">ยอดนักโปรแกรมเมอร์จิ๋ว : The Coder’s Way 🧩โหมดนักวางแผน</p>
+        <hr>
+
+       <div id="auth-section">
+            <p>กรุณาใส่รหัสผ่านเพื่อเข้าถึงข้อมูลสถิติ</p>
+            <input type="password" id="pass-input" placeholder="รหัสผ่าน...">
+            <button class="btn btn-login" onclick="checkAuth()">เข้าสู่ระบบ</button>
+        </div>
+
+        <div id="admin-content">
+            <h3>📊 รายชื่อนักเรียนทั้งหมดในเครื่องนี้ 🧩โหมดนักวางแผน</h3>
+            <table class="stats-table">
+                <thead>
+                    <tr>
+                        <th>ลำดับ</th>
+                        <th>ชื่อ-นามสกุล</th> <th>เลขที่</th>
+                        <th>ระดับชั้น</th>
+                        <th>คะแนน</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-tbody">
+                </tbody>
+            </table>
+
+            <div style="margin-top: 30px; padding: 20px; border: 1px dashed red; border-radius: 10px; background: #fff5f5;">
+                <h4 style="color: red; margin-top: 0;">⚠️ พื้นที่อันตราย</h4>
+                <p>ปุ่มนี้ใช้สำหรับลบสถิติเพื่อเริ่มเก็บข้อมูลกลุ่มใหม่</p>
+                <button class="btn btn-delete" onclick="clearData()">🗑️ ล้างข้อมูลทั้งหมดในเครื่อง</button>
+            </div>
+        </div>
+
+        <br>
+        <a href="main.html" class="btn btn-back">⬅️ กลับหน้าหลักเกม</a>
+    </div>
+
+    <script>
+        const ADMIN_PASS = "094481604"; // รหัสผ่านครู
+
+        function checkAuth() {
+            const input = document.getElementById('pass-input').value;
+            if (input === ADMIN_PASS) {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                loadStats();
+            } else {
+                alert("รหัสผ่านไม่ถูกต้องครับคุณครู!");
+            }
+        }
+
+        function loadStats() {
+            const tbody = document.getElementById('admin-tbody');
+            // ดึงข้อมูลจากสมุดบันทึก (LocalStorage)
+            const allScores = JSON.parse(localStorage.getItem('aocla_Hard')) || [];
+            
+            if (allScores.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">ยังไม่มีข้อมูลผู้เล่น</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allScores.map((item, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td style="color: #1565c0; font-weight: bold;">${item.name || "-"}</td> <td>${item.no || "-"}</td>
+                    <td style="text-align: left; padding-left: 20px;">${item.uClass}</td>
+                    <td style="font-weight: bold; color: #e65100;">${item.score}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearData() {
+            if (confirm("คุณครูยืนยันที่จะลบข้อมูลสถิติทั้งหมดใช่หรือไม่?")) {
+                localStorage.removeItem('aocla_Hard');
+                alert("ล้างข้อมูลเรียบร้อยแล้วครับ");
+                loadStats();
+            }
+        }
+    </script>
+</body>
+</html>
