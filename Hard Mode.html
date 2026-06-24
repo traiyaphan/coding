@@ -196,21 +196,21 @@
     100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
+
 .obstacle-animated {
-    display: inline-block;
+    display: inline-block; /* สำคัญมาก: เพื่อให้หมุนและขยายได้ */
     animation: obstacleAppear 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
-    font-size: 30px; /* ปรับขนาดอิโมจิที่นี่ */
-	display: inline-block; /* สำคัญมากเพื่อให้ขยายได้ */
-    font-size: 32px;       /* ขนาดของ Emoji */
-    cursor: pointer;
-    transition: transform 0.3s ease; /* ทำให้ตอน Hover หรือเด้งดูนุ่มนวล */
-    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+   cursor: pointer; /* เปลี่ยนรูปเม้าส์เป็นนิ้วชี้ */
 }
+
 /* ลูกเล่นขยายใหญ่ตอนเอาเมาส์ไปชี้ */
 /* 2. คำสั่งเมื่อเม้าส์ไปชี้ (Hover) */
 .obstacle-animated:hover {
     transform: scale(1.3); /* ขยายใหญ่ขึ้น 30% */
     filter: drop-shadow(0 0 8px rgba(255, 213, 79, 0.8)); /* เพิ่มแสงฟุ้งรอบๆ ให้ดูเด่นขึ้น */
+
+
+}
 		
 		
     </style>
