@@ -520,13 +520,13 @@ function canNavigate(start, end, obstacles) {
 		let obstacleCount = 0;
 		//let obstacleCount = curLvl < 10 ? 5 : 8;
 		if (curLvl < 5) {
-			obstacleCount = 4; // ด่าน 1-5: อุปสรรค 6 อัน (ง่ายมาก)
+			obstacleCount = 8; // ด่าน 1-5: อุปสรรค 8 อัน (ง่ายมาก)
 		} else if (curLvl < 10) {
-			obstacleCount = 7; // ด่าน 6-10: อุปสรรค 7 อัน (เริ่มยาก)
+			obstacleCount = 10; // ด่าน 6-10: อุปสรรค 10 อัน (เริ่มยาก)
 		} else if (curLvl < 17) {
-			obstacleCount = 8; // ด่าน 11-15: อุปสรรค 8 อัน (ท้าทาย)
+			obstacleCount = 12; // ด่าน 11-15: อุปสรรค 12 อัน (ท้าทาย)
 		} else {
-			obstacleCount = 10; // ด่าน 16-20: อุปสรรค 10 อัน (โหดมาก)
+			obstacleCount = 14; // ด่าน 16-20: อุปสรรค 14 อัน (โหดมาก)
 		}
 
 		let startPos = level.start ? level.start : { x: 0, y: 0 };
