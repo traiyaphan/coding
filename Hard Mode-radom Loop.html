@@ -63,9 +63,12 @@
         .cmd-badge { background: #43a047; color: white; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold; }
         .btn-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         button { padding: 12px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 4px #1b5e20; font-family: 'Sarabun'; }
-        .btn-cmd { background: #66bb6a; color: white; }
-        .btn-run { background: linear-gradient(135deg, #ff9800, #f57c00); color: white; width: 100%; font-size: 18px; margin-top: 15px; box-shadow: 0 4px #e65100; }
-        .btn-delete { background: #f44336; color: white; width: 100%; margin-top: 10px; box-shadow: 0 4px #b71c1c; }
+        .btn-cmd { background: #F97316; color: white; font-size:20px}
+		.btn-cmddd { background: #3B82F6; color: white; font-size:20px}
+		.btn-d { background: #66bb6a; color: white; font-size:20px}
+		.btn-cmdddd { background: #EC4899; color: white; font-size:20px}
+        .btn-run { background: linear-gradient(135deg, #ff9800, #f57c00); color: white; width: 100%; font-size: 20px; margin-top: 15px; box-shadow: 0 4px #e65100; }
+        .btn-delete { background: #f44336; color: white; width: 100%; margin-top: 10px; box-shadow: 0 4px #b71c1c; font-size:20px}
         .stats { margin-bottom: 10px; font-size: 18px; font-weight: bold; color: #1b5e20; display: flex; justify-content: space-between; }
         #msg { color: #d32f2f; font-weight: bold; text-align: center; min-height: 24px; margin-top: 10px; font-size: 14px; }
 .obstacle-icon {
@@ -331,9 +334,9 @@ input[type="range"] { vertical-align: middle; }
 
 			<div class="btn-group">
 				<button class="btn-cmd" onclick="handleInput('⬆️')">⬆️ ขึ้น</button>
-             	<button class="btn-cmd" onclick="handleInput('⬇️')">⬇️ ลง</button>
-                <button class="btn-cmd" onclick="handleInput('⬅️')">⬅️ ซ้าย</button>
-                <button class="btn-cmd" onclick="handleInput('➡️')">➡️ ขวา</button>
+                <button class="btn-d" onclick="handleInput('⬇️')">⬇️ ลง</button>
+                <button class="btn-cmddd" onclick="handleInput('⬅️')">⬅️ ซ้าย</button>
+                <button class="btn-cmdddd" onclick="handleInput('➡️')">➡️ ขวา</button>
             <button id="run-btn" class="btn-run" onclick="runCommands()">🚀 เดินตามแผน</button>
             <button class="btn-delete" onclick="deleteLastCommand()">❌ ลบ</button>
         </div>
